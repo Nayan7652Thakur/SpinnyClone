@@ -14,11 +14,13 @@ const Hero = () => {
 
   const [index, setIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const [loading, setLoading] = useState(true); // Loading state
   const thumbRef = useRef(null);
 
   const changeImage = (newIndex) => {
     if (animating || newIndex === index) return;
     setAnimating(true);
+    setLoading(true); // Set loading true when changing image
     setTimeout(() => {
       setIndex(newIndex);
       setAnimating(false);
@@ -31,7 +33,7 @@ const Hero = () => {
 
   const scrollThumbnails = (direction) => {
     if (!thumbRef.current) return;
-    const scrollAmount = 150; // pixels per click
+    const scrollAmount = 150;
     if (direction === "left") {
       thumbRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
     } else {
@@ -49,10 +51,12 @@ const Hero = () => {
         <span className="text-indigo-500"> {product.name}</span>
       </p>
 
-      {/* Main image + thumbnails */}
       <div className="flex flex-col gap-4 relative">
         {/* Main image */}
-        <div className="relative w-full h-64 sm:h-[400px] rounded-lg overflow-hidden">
+        <div className="relative w-full h-64 sm:h-[400px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+          {loading && (
+            <div className="absolute text-gray-500">Loading...</div>
+          )}
           <img
             key={index}
             src={product.images[index]}
@@ -60,9 +64,9 @@ const Hero = () => {
             className={`w-full h-full object-cover absolute top-0 left-0 transition-transform duration-300 ${
               animating ? "-translate-x-full" : "translate-x-0"
             }`}
+            onLoad={() => setLoading(false)} // Image loaded
           />
 
-          {/* Left button */}
           <button
             onClick={prevImage}
             className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
@@ -70,7 +74,6 @@ const Hero = () => {
             &#8249;
           </button>
 
-          {/* Right button */}
           <button
             onClick={nextImage}
             className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-3 rounded-full hover:bg-black/60 transition"
@@ -79,7 +82,7 @@ const Hero = () => {
           </button>
         </div>
 
-        {/* Thumbnails carousel */}
+        {/* Thumbnails */}
         <div className="relative mt-2">
           <div
             ref={thumbRef}
@@ -102,7 +105,6 @@ const Hero = () => {
             ))}
           </div>
 
-          {/* Left scroll button */}
           <button
             onClick={() => scrollThumbnails("left")}
             className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition"
@@ -110,7 +112,6 @@ const Hero = () => {
             &#8249;
           </button>
 
-          {/* Right scroll button */}
           <button
             onClick={() => scrollThumbnails("right")}
             className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 transition"
